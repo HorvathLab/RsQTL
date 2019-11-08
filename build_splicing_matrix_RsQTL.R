@@ -76,6 +76,7 @@ counts <- counts %>% mutate(read_ratio = reads / cluster_read_sum)
 # Remove introns that are NA, 1, or 0 in more than the specified fraction of samples 
 counts <- counts %>% group_by(contig, coord1, coord2) %>%
   mutate(
+    intron = paste0(contig, ":", coord1, "_", coord2),
     frac_na = length(read_ratio[is.na(read_ratio)]) / n(),
     frac_zero = length(read_ratio[read_ratio == 0]) / n(),
     frac_one = length(read_ratio[read_ratio == 1]) / n()
@@ -90,8 +91,7 @@ counts <- counts %>% group_by(contig, coord1, coord2) %>%
 # Remove clusters that have only a single intron
 if (remove_singletons) {
   counts <- counts %>% group_by(cluster) %>% 
-    mutate(intron = paste0(contig, ":", coord1, "_", coord2),
-           num_introns = length(unique(intron))) %>%
+    mutate(num_introns = length(unique(intron))) %>%
     filter(num_introns != 1) %>%
     ungroup()
 }
