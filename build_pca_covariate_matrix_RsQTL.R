@@ -20,9 +20,9 @@ handle_command_args <- function(args) {
     mutate_all(as.character)
   
   # splicing and read count matrix files
-  rc <<- fread(arg_df$value[arg_df$flag == "-r"])
-  splicing <<- fread(arg_df$value[arg_df$flag == "-s"])
-  additional_covs <<- ifelse(length(arg_df$value[arg_df$flag == "-c"]) > 0, as.numeric(arg_df$value[arg_df$flag == "-c"]), data.frame())
+  rc <<- data.frame(fread(arg_df$value[arg_df$flag == "-r"]))
+  splicing <<- data.frame(fread(arg_df$value[arg_df$flag == "-s"]))
+  additional_covs <<- data.frame(ifelse(length(arg_df$value[arg_df$flag == "-c"]) > 0, fread(arg_df$value[arg_df$flag == "-c"]), data.frame()))
   
   # specify how many PCs to retain
   n_pcs <<- ifelse(length(arg_df$value[arg_df$flag == "-n"]) > 0, as.numeric(arg_df$value[arg_df$flag == "-n"]), 10)
@@ -39,7 +39,6 @@ handle_command_args(args)
 # compute pcs for splicing data
 pcs_spl <- prcomp(data = splicing[,-1], ~., na.action = na.omit)
 pca_spl_plot <- factoextra::fviz_eig(pcs_spl, addlabels = TRUE)
-pcs_spl <- pcs_spl$rotation[,1:n_pcs]
 
 # output pcs plot for splicing data
 pdf(paste0(output_prefix, "_splicing_pca_plot.pdf"))
@@ -49,12 +48,16 @@ dev.off()
 # compute pcs for read count data
 pcs_rc <- prcomp(data = rc[,-1], ~., na.action = na.omit)
 pca_rc_plot <- factoextra::fviz_eig(pcs_rc, addlabels = TRUE)
-pcs_rc <- pcs_rc$rotation[,1:n_pcs]
 
 # output pcs plot for readcount data
 pdf(paste0(output_prefix, "_readcount_pca_plot.pdf"))
 print(pca_rc_plot)
 dev.off()
+
+# select specified number of pcs (if possible)
+n_pcs_act <- min(n_pcs, ncol(pcs_spl$rotation), ncol(pcs_spl$rotation))
+pcs_spl <- pcs_spl$rotation[,1:n_pcs_act]
+pcs_rc <- pcs_rc$rotation[,1:n_pcs_act]
 
 # combine into one file
 pcs_spl <- data.frame(t(pcs_spl))
