@@ -16,7 +16,7 @@ handle_command_args <- function(args) {
   if(length(args) %% 2 != 0) stop("Command line arguments supplied incorrectly!")
   
   # load the flags into a "dictionary"
-  arg_df <- data.frame(cbind(flag = args[seq(1, length(args), by = 2)], value = args[seq(2, length(args), by = 2)])) %>%
+  arg_df <<- data.frame(cbind(flag = args[seq(1, length(args), by = 2)], value = args[seq(2, length(args), by = 2)])) %>%
     mutate_all(as.character)
   
   # load in matrices
@@ -39,7 +39,7 @@ c.names <- colnames(covar)[-1]
 conc <- intersect(intersect(v.names, s.names), c.names)
 
 # select only the concordant samples from all 3 matrices
-vaf.clean <- vaf[,c("SNP", conc)]
+vaf.clean <- vaf[,c("SNV", conc)]
 spl.clean <- spl[,c("intron", conc)]
 covar.clean <- covar[,c("id", conc)]
 
