@@ -22,7 +22,7 @@ handle_command_args <- function(args) {
   # load in matrices
   vaf <<- data.frame(fread(arg_df$value[arg_df$flag == "-r"]))
   spl <<- data.frame(fread(arg_df$value[arg_df$flag == "-s"]))
-  cov <<- data.frame(fread(arg_df$value[arg_df$flag == "-c"]))
+  covar <<- data.frame(fread(arg_df$value[arg_df$flag == "-c"]))
   
 }
 
@@ -33,7 +33,7 @@ handle_command_args(args)
 # get the samples present in each
 v.names <- colnames(vaf)[-1]
 s.names <- colnames(spl)[-1]
-c.names <- colnames(cov)[-1]
+c.names <- colnames(covar)[-1]
 
 # get the samples in all 3 matrices
 conc <- intersect(intersect(v.names, s.names), c.names)
@@ -41,9 +41,9 @@ conc <- intersect(intersect(v.names, s.names), c.names)
 # select only the concordant samples from all 3 matrices
 vaf.clean <- vaf[,c("SNP", conc)]
 spl.clean <- spl[,c("intron", conc)]
-cov.clean <- cov[,c("id", conc)]
+covar.clean <- covar[,c("id", conc)]
 
 # write the fixed outputs to a file
 write.table(vaf.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-r"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
 write.table(spl.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-s"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
-write.table(cov.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-c"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
+write.table(covar.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-c"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
