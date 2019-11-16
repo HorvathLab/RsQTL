@@ -24,19 +24,23 @@ handle_command_args <- function(args) {
   splicing_matrix <<- fread(arg_df$value[arg_df$flag == "-s"]) %>% gather(sample, ratio, -contains("intron")) %>% drop_na()
   
   # load in a results file
-  results <<- ifelse(length(arg_df$value[arg_df$flag == "-res"]) > 0, fread(arg_df$value[arg_df$flag == "-res"]) %>% 
-    arrange(FDR) %>% head(n_to_plot) %>% as.data.frame() %>%
-    mutate(pair = paste0(SNV, "_", gene)), data.frame())
-  
+  if (length(arg_df$value[arg_df$flag == "-res"]) > 0) {
+    results <<- fread(arg_df$value[arg_df$flag == "-res"]) %>% 
+      as.data.frame() %>%
+      arrange(FDR) %>%
+      mutate(pair = paste0(SNP, "_", gene))
+  }
+
   # specify plotting mode
-  mode <<- arg_df$value[arg_df$flag == "-m"]
+  plot_mode <<- arg_df$value[arg_df$flag == "-m"]
   
   # if bulk plotting, specify number of top correlations to plot
-  n_to_plot <- ifelse((arg_df$value[arg_df$flag == "-n"]) > 0, arg_df$value[arg_df$flag == "-n"], 200)
+  n_to_plot <<- ifelse((arg_df$value[arg_df$flag == "-n"]) > 0, arg_df$value[arg_df$flag == "-n"], 200)
+  n_to_plot <<- ifelse(n_to_plot > nrow(results), nrow(results), n_to_plot)
   
   # if plotting an individual correlation, specify the intron and SNV to plot
-  my_snv <- arg_df$value[arg_df$flag == "-snv"]
-  my_intron <- arg_df$value[arg_df$flag == "-intron"]
+  my_snv <<- arg_df$value[arg_df$flag == "-snv"]
+  my_intron <<- arg_df$value[arg_df$flag == "-intron"]
   
   # specify output prefix
   output_prefix <<- arg_df$value[arg_df$flag == "-o"]
@@ -47,12 +51,13 @@ handle_command_args <- function(args) {
 args <- commandArgs(trailingOnly = TRUE)
 handle_command_args(args)
 
-if(mode == "bulk") {
+if(plot_mode == "bulk") {
   ### FOR PLOTTING BULK SNVs
+  results <- head(results, n_to_plot)
   vaf_matrix <- vaf_matrix[unlist(vaf_matrix[,1]) %in% results[,1],]
   splicing_matrix <- splicing_matrix[unlist(splicing_matrix[,1]) %in% results[,2],]
   
-  plot_df <- left_join(left_join(results, vaf_matrix), splicing_matrix, by = c("gene" = "intron", "sample"))
+  plot_df <- left_join(left_join(results, vaf_matrix, by = c("SNP" = "SNV")), splicing_matrix, by = c("gene" = "intron", "sample"))
   p <- ggscatter(plot_df, x = "vaf", y = "ratio",
                  fill = "lightsteelblue", color = "lightsteelblue", shape = 21, size = 1.5, # Points color, shape and size
                  add = "reg.line",  # Add regression line
@@ -62,10 +67,10 @@ if(mode == "bulk") {
                  cor.coeff.args = list(method = "spearman", label.sep = "\n")) +
     labs(x = "Variant allele fraction", y = "Proportion of read spanning intron junction")
   
-  pdf(paste0("RsQTL_plots_top", n_to_plot, ".pdf"), width = n_to_plot / 8, height = n_to_plot / 2)
+  pdf(paste0("RsQTL_plots_top", n_to_plot, ".pdf"), width = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8), height = ifelse(n_to_plot / 2 >= 2, n_to_plot / 2, 2))
   print(facet(p, facet.by = "pair", ncol = 5, scales = "free_y"))
   dev.off()
-} else if (mode == "single") {
+} else if (plot_mode == "single") {
   ### FOR PLOTTING INDIVIDUAL SNVs
   plot_df <- left_join(vaf_matrix %>% filter(SNV == !!my_snv), 
                        splicing_matrix %>% filter(intron == !!my_intron), 

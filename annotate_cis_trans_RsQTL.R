@@ -38,7 +38,7 @@ handle_command_args(args)
 # annotate which gene the SNP resides in
 # classify RsQTLs in which the two members of the pair are in the same gene as cis
 # classify all others as trans
-res <- reqtls %>% mutate(new_SNP = SNP, new_gene = gene) %>%
+res <- rsqtls %>% mutate(new_SNP = SNP, new_gene = gene) %>%
   separate(new_SNP, into = c("chrom", "start", "ref", "alt")) %>%
   mutate(end = start)
 
@@ -47,18 +47,18 @@ res_gr <- GRanges(res)
 overlaps <- findOverlaps(res_gr, gene_locs_gr, select = "last", type = "within")
 genes_snp <- gene_locs$ensembl_gene[overlaps]
 
-res <- reqtls %>% mutate(new_SNP = SNP, new_gene = gene) %>%
+res <- rsqtls %>% mutate(new_SNP = SNP, new_gene = gene) %>%
   separate(new_gene, into = c("chrom", "start", "end")) %>%
   mutate(chrom = gsub("chr", "", chrom))
 res_gr <- GRanges(res)
 overlaps <- findOverlaps(res_gr, gene_locs_gr, select = "last", type = "within")
 genes_intron <- gene_locs$ensembl_gene[overlaps]
 
-res <- reqtls
+res <- rsqtls
 res$gene_snp <- genes_snp
 res$gene_intron <- genes_intron
 
 res <- res %>% mutate(class = ifelse(gene_snp == gene_intron, "cis", "trans"))
   
 # write the results to a file
-write.table(res, paste0(output_prefix, "all_RsQTLs_cistrans_ann.txt"), quote = F, row.names = F, sep = '\t')
+write.table(res, paste0(output_prefix, "_cistrans_ann.txt"), quote = F, row.names = F, sep = '\t')

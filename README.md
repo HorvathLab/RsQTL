@@ -185,7 +185,7 @@ Annotates the output of RsQTL as cis/trans based on whether the SNV and paired i
 
 #### Sample command
 ```
-Rscript annotate_cis_trans_RsQTL.R -r RsQTL_test_all_RsQTLs.txt -g gene_locations_hg38.txt -o RsQTL_test
+Rscript annotate_cis_trans_RsQTL.R -r RsQTL_test_all_RsQTLs.txt -g data/gene_locations_hg38.txt -o RsQTL_test
 ```
 &nbsp;
 
@@ -210,7 +210,7 @@ Plots either the top n most significant RsQTLs in the input file or a specific S
 
 #### Sample command
 ```
-Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -m bulk -n 200 -o RsQTL_test
+Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix_harmonized.txt -s RsQTL_test_splicing_matrix_harmonized.txt -res RsQTL_test_cistrans_ann.txt -m bulk -n 200 -o RsQTL_test
 ```
 &nbsp;
 
