@@ -209,9 +209,17 @@ Plots either the top n most significant RsQTLs in the input file or a specific S
 
 
 #### Sample command
+
+Bulk mode
 ```
 Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix_harmonized.txt -s RsQTL_test_splicing_matrix_harmonized.txt -res RsQTL_test_cistrans_ann.txt -m bulk -n 200 -o RsQTL_test
 ```
+
+Single mode
+```
+Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix_harmonized.txt -s RsQTL_test_splicing_matrix_harmonized.txt -res RsQTL_test_cistrans_ann.txt -m single -snv "1:952657_T>C" -intron "chr12:56160320_56161387" -o RsQTL_test
+```
+
 &nbsp;
 
 ## Authors and Acknowledgements
