@@ -50,7 +50,7 @@ Transforms the raw LeafCutter output into a matrix suitable for RsQTL analysis
 
 #### Sample Command
 ```
-Rscript build_splicing_matrix_RsQTL.R -c leafcutter.counts -o RsQTL_test
+Rscript build_splicing_matrix_RsQTL.R -c data/sample_junction_matrix.counts -o RsQTL_test
 ```
 
 &nbsp;
@@ -101,7 +101,7 @@ Creates a covariate matrix of principal components from the VAF and junction mat
 
 #### Sample command
 ```
-Rscript build_pca_covariate_matrix_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c RsQTL_covariates.txt -n 10 -o RsQTL_test
+Rscript build_pca_covariate_matrix_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c data/additional_covariates_matrix.txt -n 10 -o RsQTL_test
 ```
 &nbsp;
 
@@ -125,7 +125,7 @@ Harmonizes matrices so that all inputs for run_matrix_RsQTL.R contain the same s
 
 #### Sample command
 ```
-Rscript harmonize_matrices_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c RsQTL_covariate_pca_matrix.txt
+Rscript harmonize_matrices_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c RsQTL_test_covariate_pca_matrix.txt
 ```
 &nbsp;
 
@@ -160,12 +160,12 @@ OR
 
 Splitting *cis* and *trans*
 ```
-Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix.txt -il RsQTL_test_gene-exp-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix.txt -ct T -qq test_qqplot --pcis 0.001 -ptr 0.00001 -o RsQTL_test
+Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix_harmonized.txt -il RsQTL_test_splicing-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix_harmonized.txt -ct T -qq RsQTL_test_qqplot -pcis 0.001 -ptr 0.00001 -o RsQTL_test
 ```
 
 Unified *cis* and *trans*
 ```
-Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix.txt -il RsQTL_test_gene-exp-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix.txt -ct F -qq test_qqplot -p 0.0001 -o RsQTL_test 
+Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix_harmonized.txt -il RsQTL_test_splicing-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix_harmonized.txt -ct F -qq RsQTL_test_qqplot -p 0.0001 -o RsQTL_test
 ```
 &nbsp;
 
