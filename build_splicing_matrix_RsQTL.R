@@ -1,15 +1,11 @@
 # BUILD_SPLICING_MATRIX_RSQTL.R
-# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 1, 2019
+# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 26, 2019
 
-# install missing required packages and load packages
-load_package <- function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, dep = TRUE)
-    if(!require(x, character.only = TRUE)) stop(paste0("Package: ", x, " not found"))
-  }
-}
+# load packages
+suppressMessages(library(tidyverse))
+suppressMessages(library(data.table))
+suppressMessages(library(factoextra))
 
-load_package("tidyverse"); load_package("data.table"); load_package("factoextra")
 
 handle_command_args <- function(args) {
   # make sure all flags are paired
@@ -116,5 +112,11 @@ if (remove_high_nas) {
 counts <- as.matrix(counts)
 counts_loc <- as.matrix(counts_loc)
 
-write.table(counts, paste0(output_prefix, '_splicing_matrix.txt'), quote = F, row.names = F, sep = '\t')
-write.table(counts_loc, paste0(output_prefix, '_splicing-loc_matrix.txt'), quote = F, row.names = F, sep = '\t')
+if (!dir.exists("output")) {
+  cat('Creating output directory...\n')
+  dir.create('output')
+}
+
+write.table(counts, paste0("output/", output_prefix, '_splicing_matrix.txt'), quote = F, row.names = F, sep = '\t')
+write.table(counts_loc, paste0("output/", output_prefix, '_splicing-loc_matrix.txt'), quote = F, row.names = F, sep = '\t')
+cat(paste0("Splicing and intron locations for MatrixEQTL saved to output/", output_prefix, "_splicing_matrix.txt and output/", output_prefix, "_splicing-loc_matrix.txt.\n"))

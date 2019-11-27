@@ -1,15 +1,10 @@
 # BUILD_VAF_MATRIX_RSQTL.R
-# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 1, 2019
+# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 26, 2019
 
-# install missing required packages and load packages
-load_package <- function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, dep = TRUE)
-    if(!require(x, character.only = TRUE)) stop(paste0("Package: ", x, " not found"))
-  }
-}
+# load packages
+suppressMessages(library(tidyverse))
+suppressMessages(library(data.table))
 
-load_package("tidyverse"); load_package("data.table");
 
 handle_command_args <- function(args) {
   # make sure all flags are paired
@@ -73,5 +68,12 @@ df <- df %>% spread(AlignedReads, R)
 df <- as.matrix(df)
 
 # write outputs
-write.table(df, paste0(output_prefix, '_VAF_matrix.txt'), quote = F, row.names = F, sep = '\t')
-write.table(df_loc, paste0(output_prefix, '_VAF-loc_matrix.txt'), quote = F, row.names = F, sep = '\t')
+if (!dir.exists("output")) {
+  cat('Creating output directory...\n')
+  dir.create('output')
+} 
+
+write.table(df, paste0("output/", output_prefix, '_VAF_matrix.txt'), quote = F, row.names = F, sep = '\t')
+write.table(df_loc, paste0("output/", output_prefix, '_VAF-loc_matrix.txt'), quote = F, row.names = F, sep = '\t')
+cat(paste0("VAF matrix and locations for MatrixEQTL saved to output/", output_prefix, "_VAF_matrix.txt and output/", output_prefix, "_VAF-loc_matrix.txt.\n"))
+

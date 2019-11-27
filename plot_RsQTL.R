@@ -1,15 +1,11 @@
 # PLOT_RSQTL.R
-# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 1, 2019
+# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 26, 2019
 
 # install missing required packages and load packages
-load_package <- function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, dep = TRUE)
-    if(!require(x, character.only = TRUE)) stop(paste0("Package: ", x, " not found"))
-  }
-}
+suppressMessages(library(tidyverse))
+suppressMessages(library(data.table))
+suppressMessages(library(ggpubr))
 
-load_package("tidyverse"); load_package("data.table"); load_package("ggpubr")
 
 handle_command_args <- function(args) {
   # make sure all flags are paired
@@ -67,9 +63,10 @@ if(plot_mode == "bulk") {
                  cor.coeff.args = list(method = "spearman", label.sep = "\n")) +
     labs(x = "Variant allele fraction", y = "Proportion of read spanning intron junction")
   
-  pdf(paste0("RsQTL_plots_top", n_to_plot, ".pdf"), width = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8), height = ifelse(n_to_plot / 2 >= 2, n_to_plot / 2, 2))
+  pdf(paste0("output/RsQTL_plots_top", n_to_plot, ".pdf"), width = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8), height = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8))
   print(facet(p, facet.by = "pair", ncol = 5, scales = "free_y"))
-  dev.off()
+  garbage <- dev.off()
+  cat(paste0("Bulk plot saved to saved to output/", "RsQTL_plots_top", n_to_plot, ".pdf\n"))
 } else if (plot_mode == "single") {
   ### FOR PLOTTING INDIVIDUAL SNVs
   plot_df <- left_join(vaf_matrix %>% filter(SNV == !!my_snv), 
@@ -85,8 +82,9 @@ if(plot_mode == "bulk") {
                  cor.coeff.args = list(method = "spearman", label.sep = "\n")) +
     labs(x = "Variant allele fraction", y = "Proportion of read spanning intron junction", title = paste0(my_snv, "-", my_intron))
   
-  pdf(gsub(":", "_", paste0("RsQTL_plot_", my_snv, "-", my_intron, ".pdf")))
+  pdf(paste0("output/", paste0(gsub(":", "_", paste0("RsQTL_plot_", my_snv, "-", my_intron, ".pdf")))))
   print(p)
-  dev.off()
+  garbage <- dev.off()
+  cat(paste0("Single plot saved to output/", gsub(":", "_", paste0("RsQTL_plot_", my_snv, "-", my_intron, ".pdf\n"))))
   
-} else stop("ERROR: Invalid mode specified!")
+} else stop("ERROR: Invalid mode specified!\n")

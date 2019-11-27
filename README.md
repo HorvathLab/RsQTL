@@ -2,11 +2,34 @@
 
 This toolkit contains the required scripts to transform sequencing files into RsQTL input files and run the MatrixEQTL R package to identify significant variation-splicing relationships.
 
+
+&nbsp;
+
+
 ## Getting Started
 
 These instructions will get you a copy of the scripts up and running on your machine for development and testing purposes. See *Running the scripts* for notes on how to use the project on a live system. We have provided sample data that can be used to test the pipeline. It also serves as an example of the data format the pipeline expects.
 
+This package was developed on R version 3.6.1 on macOS High Sierra.
+
 ### Prerequisites
+
+* The following R packages installed on your machine:
+
+  ```
+  tidyverse
+  MatrixEQTL
+  data.table
+  GenomicRanges
+  factoextra
+  ggpubr
+  ```
+  
+  You may install the packages using the following commands:
+  ```
+  install.packages(c("tidyverse", "MatrixEQTL", "data.table", "factoextra", "ggpubr", "BiocManager"))
+  BiocManager::install("GenomicRanges")
+  ```
 
 * Each of the following scripts copied to a working directory on your machine
 
@@ -26,6 +49,11 @@ These instructions will get you a copy of the scripts up and running on your mac
 
 ## Running the scripts
 
+The scripts are designed to be run from the *Unix command line* (Terminal on macOS) from the root directory (by default RsQTL-master if the toolkit was downloaded from the link above). Make sure to *cd* to this directory before beginning.
+
+***
+
+&nbsp;
 
 ### build_splicing_matrix_RsQTL.R
 
@@ -45,8 +73,8 @@ Transforms the raw LeafCutter output into a matrix suitable for RsQTL analysis
 
 
 #### Output
-* One file (in the script’s directory) with the cluster read ratios for each intron in each sample
-* One file (in the script’s directory) with the genomic locations for each intron
+* One file (in the output directory) with the cluster read ratios for each intron in each sample
+* One file (in the output directory) with the genomic locations for each intron
 
 #### Sample Command
 ```
@@ -92,17 +120,20 @@ Creates a covariate matrix of principal components from the VAF and junction mat
 * The path to the splicing matrix created by build_junction_matrix_RsQTL.R (-s)
 * *OPTIONAL:* The path to any additional covariates (-c)
 * *OPTIONAL:* The number of PCs to include as covariates (-n, default = 10)
+  * *NOTE:* You may want to run this script once with the default value then adjust the number of PCs used based on the variance plots. Read more about selecting an appropriate number of principal components [here.](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/112-pca-principal-component-analysis-essentials/)
 * The desired prefix of the output covariate matrix (-o)
 
 
 #### Output
-* A covariate matrix containing the top *n* VAF and cluster read ratio principal components as well as any additional supplied covariates.
+* A covariate matrix containing the top *n* VAF and cluster read ratio principal components as well as any additional supplied covariates
+* Scree plots showing the percentage of variance explained by principal components of the VAF and splicing matrices
 
 
 #### Sample command
 ```
-Rscript build_pca_covariate_matrix_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c data/additional_covariates_matrix.txt -n 10 -o RsQTL_test
+Rscript build_pca_covariate_matrix_RsQTL.R -r output/RsQTL_test_VAF_matrix.txt -s output/RsQTL_test_splicing_matrix.txt -c data/additional_covariates_matrix.txt -n 10 -o RsQTL_test
 ```
+
 &nbsp;
 
 ***
@@ -120,13 +151,14 @@ Harmonizes matrices so that all inputs for run_matrix_RsQTL.R contain the same s
 * The path to the covariate matrix created by build_pca_covariate_matrix_RsQTL.R (if no covariate information is used, you will need to modify this script to remove the references to the covariate matrix)
 
 #### Output
-* The three input matrices with only the samples contained in all three
+* Three matrices (in the output directory) corresponding to the three input files, but including only samples that were present in all three input files
 
 
 #### Sample command
 ```
-Rscript harmonize_matrices_RsQTL.R -r RsQTL_test_VAF_matrix.txt -s RsQTL_test_splicing_matrix.txt -c RsQTL_test_covariate_pca_matrix.txt
+Rscript harmonize_matrices_RsQTL.R -r output/RsQTL_test_VAF_matrix.txt -s output/RsQTL_test_splicing_matrix.txt -c output/RsQTL_test_covariate_pca_matrix.txt
 ```
+
 &nbsp;
 
 ***
@@ -150,17 +182,17 @@ Runs the RsQTL analysis using MatrixEQTL
 
 
 #### Output
-* One file (in the script’s directory) with the *cis* RsQTLs
-* One file (in the script’s directory) with the *trans* RsQTLs
+* One file (in the output directory) with the *cis* RsQTLs
+* One file (in the output directory) with the *trans* RsQTLs
 OR
-* One file (in the script’s directory) with all of the unified RsQTLs depending on the logical specified above
+* One file (in the output directory) with all of the unified RsQTLs depending on the logical specified above
 
 
 #### Sample commands
 
 Splitting *cis* and *trans*
 ```
-Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix_harmonized.txt -il RsQTL_test_splicing-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix_harmonized.txt -ct T -qq RsQTL_test_qqplot -pcis 0.001 -ptr 0.00001 -o RsQTL_test
+Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl output/RsQTL_test_VAF-loc_matrix.txt -i output/RsQTL_test_splicing_matrix_harmonized.txt -il output/RsQTL_test_splicing-loc_matrix.txt -c output/RsQTL_test_pca_covariate_matrix_harmonized.txt -ct T -qq RsQTL_test_qqplot -pcis 0.001 -ptr 0.00001 -o RsQTL_test
 ```
 
 Unified *cis* and *trans*
@@ -180,7 +212,7 @@ Annotates the output of RsQTL as cis/trans based on whether the SNV and paired i
 * The desired prefix of the output annotated results file (-o)
 
 #### Output
-* One file (in the script’s directory) with the RsQTLs annotated as *cis* or *trans*
+* One file (in the output directory) with the RsQTLs annotated as *cis* or *trans*
 
 
 #### Sample command
@@ -205,19 +237,19 @@ Plots either the top n most significant RsQTLs in the input file or a specific S
 * The desired prefix of the output annotated results file (-o)
 
 #### Output
-* One file (in the script’s directory) containing either the bulk or individual plot
+* One file (in the output directory) containing either the bulk or individual plot
 
 
 #### Sample command
 
 Bulk mode
 ```
-Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix_harmonized.txt -s RsQTL_test_splicing_matrix_harmonized.txt -res RsQTL_test_cistrans_ann.txt -m bulk -n 200 -o RsQTL_test
+Rscript plot_RsQTL.R -r output/RsQTL_test_VAF_matrix_harmonized.txt -s output/RsQTL_test_splicing_matrix_harmonized.txt -res output/RsQTL_test_RsQTLs_cistrans_ann.txt -m bulk -n 200 -o RsQTL_test
 ```
 
 Single mode
 ```
-Rscript plot_RsQTL.R -r RsQTL_test_VAF_matrix_harmonized.txt -s RsQTL_test_splicing_matrix_harmonized.txt -res RsQTL_test_cistrans_ann.txt -m single -snv "1:952657_T>C" -intron "chr12:56160320_56161387" -o RsQTL_test
+Rscript plot_RsQTL.R -r output/RsQTL_test_VAF_matrix_harmonized.txt -s output/RsQTL_test_splicing_matrix_harmonized.txt -res output/RsQTL_test_RsQTLs_cistrans_ann.txt -m single -snv "1:952657_T>C" -intron "chr12:56160320_56161387" -o RsQTL_test
 ```
 
 &nbsp;

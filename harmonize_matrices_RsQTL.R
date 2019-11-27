@@ -1,15 +1,9 @@
 # HARMONIZE_MATRICES_RSQTL.R
-# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 1, 2019
+# LAST UPDATED BY LIAM FLINN SPURR ON NOVEMBER 26, 2019
 
-# install missing required packages and load packages
-load_package <- function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, dep = TRUE)
-    if(!require(x, character.only = TRUE)) stop(paste0("Package: ", x, " not found"))
-  }
-}
-
-load_package("tidyverse"); load_package("data.table")
+# load packages
+suppressMessages(library(tidyverse))
+suppressMessages(library(data.table))
 
 handle_command_args <- function(args) {
   # make sure all flags are paired
@@ -44,6 +38,9 @@ spl.clean <- spl[,c("intron", conc)]
 covar.clean <- covar[,c("id", conc)]
 
 # write the fixed outputs to a file
-write.table(vaf.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-r"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
-write.table(spl.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-s"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
-write.table(covar.clean, paste0(gsub(".txt", "", arg_df$value[arg_df$flag == "-c"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
+write.table(vaf.clean, paste0("output/", gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-r"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
+write.table(spl.clean, paste0("output/", gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-s"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
+write.table(covar.clean, paste0("output/", gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-c"]), "_harmonized.txt"), quote = F, row.names = F, sep = '\t')
+
+cat(paste0("Matrices containing concordant sample lists saved to output/", gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-r"]), "_harmonized.txt, output/", 
+           gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-s"]), "_harmonized.txt, and output/", gsub(".*/|.txt", "", arg_df$value[arg_df$flag == "-c"]), "_harmonized.txt.\n"))
