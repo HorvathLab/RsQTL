@@ -31,7 +31,7 @@ handle_command_args <- function(args) {
   plot_mode <<- arg_df$value[arg_df$flag == "-m"]
   
   # if bulk plotting, specify number of top correlations to plot
-  n_to_plot <<- ifelse((arg_df$value[arg_df$flag == "-n"]) > 0, arg_df$value[arg_df$flag == "-n"], 200)
+  n_to_plot <<- ifelse(length(arg_df$value[arg_df$flag == "-n"]) > 0, as.numeric(arg_df$value[arg_df$flag == "-n"]), 200)
   n_to_plot <<- ifelse(n_to_plot > nrow(results), nrow(results), n_to_plot)
   
   # if plotting an individual correlation, specify the intron and SNV to plot
@@ -63,8 +63,8 @@ if(plot_mode == "bulk") {
                  cor.coeff.args = list(method = "spearman", label.sep = "\n")) +
     labs(x = "Variant allele fraction", y = "Proportion of read spanning intron junction")
   
-  pdf(paste0("output/RsQTL_plots_top", n_to_plot, ".pdf"), width = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8), height = ifelse(n_to_plot / 8 >= 8, n_to_plot / 8, 8))
-  print(facet(p, facet.by = "pair", ncol = 5, scales = "free_y"))
+  pdf(paste0("output/RsQTL_plots_top", n_to_plot, ".pdf"), width = ifelse(n_to_plot / 4 >= 8, n_to_plot / 4, 8), height = ifelse(n_to_plot / 4 >= 8, n_to_plot / 4, 8))
+  suppressWarnings(print(facet(p, facet.by = "pair", ncol = round(sqrt(n_to_plot)), scales = "free_y")))
   garbage <- dev.off()
   cat(paste0("Bulk plot saved to saved to output/", "RsQTL_plots_top", n_to_plot, ".pdf\n"))
 } else if (plot_mode == "single") {
@@ -83,7 +83,7 @@ if(plot_mode == "bulk") {
     labs(x = "Variant allele fraction", y = "Proportion of read spanning intron junction", title = paste0(my_snv, "-", my_intron))
   
   pdf(paste0("output/", paste0(gsub(":", "_", paste0("RsQTL_plot_", my_snv, "-", my_intron, ".pdf")))))
-  print(p)
+  suppressWarnings(print(p))
   garbage <- dev.off()
   cat(paste0("Single plot saved to output/", gsub(":", "_", paste0("RsQTL_plot_", my_snv, "-", my_intron, ".pdf\n"))))
   

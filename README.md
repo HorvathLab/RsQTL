@@ -192,12 +192,12 @@ OR
 
 Splitting *cis* and *trans*
 ```
-Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl output/RsQTL_test_VAF-loc_matrix.txt -i output/RsQTL_test_splicing_matrix_harmonized.txt -il output/RsQTL_test_splicing-loc_matrix.txt -c output/RsQTL_test_pca_covariate_matrix_harmonized.txt -ct T -qq RsQTL_test_qqplot -pcis 0.001 -ptr 0.00001 -o RsQTL_test
+Rscript run_matrix_RsQTL.R -s output/RsQTL_test_VAF_matrix_harmonized.txt -sl output/RsQTL_test_VAF-loc_matrix.txt -i output/RsQTL_test_splicing_matrix_harmonized.txt -il output/RsQTL_test_splicing-loc_matrix.txt -c output/RsQTL_test_pca_covariate_matrix_harmonized.txt -ct T -qq RsQTL_test_qqplot -pcis 0.1 -ptr 0.1 -o RsQTL_test
 ```
 
 Unified *cis* and *trans*
 ```
-Rscript run_matrix_RsQTL.R -s RsQTL_test_VAF_matrix_harmonized.txt -sl RsQTL_test_VAF-loc_matrix.txt -i RsQTL_test_splicing_matrix_harmonized.txt -il RsQTL_test_splicing-loc_matrix.txt -c RsQTL_test_pca_covariate_matrix_harmonized.txt -ct F -qq RsQTL_test_qqplot -p 0.0001 -o RsQTL_test
+Rscript run_matrix_RsQTL.R -s output/RsQTL_test_VAF_matrix_harmonized.txt -sl output/RsQTL_test_VAF-loc_matrix.txt -i output/RsQTL_test_splicing_matrix_harmonized.txt -il output/RsQTL_test_splicing-loc_matrix.txt -c output/RsQTL_test_pca_covariate_matrix_harmonized.txt -ct F -qq RsQTL_test_qqplot -p 0.1 -o RsQTL_test
 ```
 &nbsp;
 
@@ -217,7 +217,7 @@ Annotates the output of RsQTL as cis/trans based on whether the SNV and paired i
 
 #### Sample command
 ```
-Rscript annotate_cis_trans_RsQTL.R -r RsQTL_test_all_RsQTLs.txt -g data/gene_locations_hg38.txt -o RsQTL_test
+Rscript annotate_cis_trans_RsQTL.R -r output/RsQTL_test_all_RsQTLs.txt -g data/gene_locations_hg38.txt -o RsQTL_test
 ```
 &nbsp;
 
